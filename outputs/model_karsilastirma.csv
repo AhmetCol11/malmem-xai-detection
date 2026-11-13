@@ -1,5 +1,5 @@
 ﻿Görev,Model,Accuracy,Precision,Recall,F1-Score,ROC-AUC,Egitim_Suresi_sn
-İkili Sınıflandırma (Class),XGBoost,1.0,1.0,1.0,1.0,1.0,0.4
-İkili Sınıflandırma (Class),LightGBM,1.0,1.0,1.0,1.0,1.0,0.27
-Çok Sınıflı (Category),XGBoost,0.85284,0.85286,0.85284,0.85271,0.97439,1.18
-Çok Sınıflı (Category),LightGBM,0.85637,0.85617,0.85637,0.8562,0.97581,0.99
+İkili Sınıflandırma (Class),XGBoost,1.0,1.0,1.0,1.0,1.0,0.38
+İkili Sınıflandırma (Class),LightGBM,1.0,1.0,1.0,1.0,1.0,0.26
+Çok Sınıflı (Category),XGBoost,0.85284,0.85286,0.85284,0.85271,0.97439,1.13
+Çok Sınıflı (Category),LightGBM,0.85637,0.85617,0.85637,0.8562,0.97581,0.76

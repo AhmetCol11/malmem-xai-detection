@@ -324,6 +324,10 @@ def main():
     joblib.dump(best_model, best_model_path)
     print(f"[+] En başarılı model ({best_name}) kaydedildi: {best_model_path}")
 
+    multi_model_path = os.path.join("outputs", "multiclass_model.joblib")
+    joblib.dump(res_lgb_multi["model_obj"], multi_model_path)
+    print(f"[+] Çok sınıflı LightGBM modeli kaydedildi: {multi_model_path}")
+
     best_info = {
         "best_model_name": best_name,
         "task": "Binary Classification (Class: Benign vs Malware)",
