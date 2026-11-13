@@ -1,21 +1,73 @@
-# Veri seti dosyaları (Boyut ve performans optimizasyonu)
-data/
-*.csv.gz
+# =============================================================================
+# MemGuard XAI - Enterprise .gitignore
+# =============================================================================
 
-# Python bytecode & cache
+# Byte-compiled / optimized / Python runtime
 __pycache__/
 *.py[cod]
 *$py.class
-*.ipynb_checkpoints/
+*.pyc
+*.pyo
+*.pyd
 
-# Virtual environments
+# Virtual Environments
 venv/
 env/
-.env
+ENV/
+env.bak/
+venv.bak/
+.venv/
 
-# IDE ve OS geçici dosyaları
+# Environment Variables, Credentials & Secrets
+.env
+.env.local
+.env.*.local
+.streamlit/secrets.toml
+.streamlit/credentials.toml
+
+# Raw Datasets and Generated Data Splits (Exclude to keep repository lightweight)
+data/*.csv
+data/Obfuscated-MalMem2022.csv
+data/X_train.csv
+data/X_test.csv
+data/y_*.csv
+*.csv.gz
+
+# Jupyter Notebooks & Checkpoints
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# IDE, Editors & Workspace Settings
 .vscode/
 .idea/
-.DS_Store
-Thumbs.db
+*.swp
+*.swo
+*~
+.project
+.pydevproject
 
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# Logs & Debugging
+*.log
+*.log.*
+logs/
+.system_generated/
+
+# Explicit Inclusions: Ensure critical project assets remain tracked
+!outputs/
+!outputs/*.png
+!outputs/*.csv
+!outputs/*.joblib
+!outputs/*.json
+!data/preprocessing_metadata.json
+!requirements.txt
+!.streamlit/config.toml

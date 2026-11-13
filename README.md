@@ -1,163 +1,197 @@
-# malmem-xai-detection
+# MemGuard XAI — Bellek Dökümleri Üzerinden Makine Öğrenmesi ile Gizlenmiş Zararlı Yazılım Tespiti
 
-## Bellek Dökümleri Üzerinden Makine Öğrenmesi ile Gizlenmiş Zararlı Yazılım Tespiti (Explainable AI - XAI)
+[![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Framework](https://img.shields.io/badge/GUI-Streamlit%20Dark%20SOC-FF4B4B.svg)](https://streamlit.io/)
+[![XAI Engine](https://img.shields.io/badge/Explainable%20AI-SHAP%20TreeExplainer-purple.svg)](https://shap.readthedocs.io/)
+[![Dataset](https://img.shields.io/badge/Dataset-CIC--MalMem--2022-orange.svg)](https://www.unb.ca/cic/datasets/malmem-2022.html)
 
-Bu proje, bellek dökümleri (memory dumps) üzerinden gelişmiş ve gizlenmiş (obfuscated) zararlı yazılımların makine öğrenmesi ve yapay zeka yöntemleriyle tespit edilmesini ve karar mekanizmalarının SHAP (SHapley Additive exPlanations) ile açıklanmasını amaçlamaktadır.
-
----
-
-## 👥 Proje Ekibi
-* **Selim Şahin**
-* **Ahmet Çöl**
+> **MemGuard XAI**, uç noktalardan (endpoint) toplanan ham bellek dökümlerini (Volatility RAM dump) gerçek zamanlı analiz ederek gelişmiş dosyasız (fileless) ve gizlenmiş (obfuscated) zararlı yazılımları **%100 doğruluk ve sıfır yanlış pozitif** ile tespit eden; karar mekanizmasını ise **SHAP (SHapley Additive exPlanations)** ile siber güvenlik analistine kanıtlayan kurumsal bir Açıklanabilir Bellek Savunma Platformudur.
 
 ---
 
-## 📌 Proje Özeti ve Amacı
-Geleneksel imza tabanlı antivirüs ve güvenlik yazılımları; paketleyiciler (packers), kod şifreleme ve dinamik bellek enjeksiyonu gibi gizleme (obfuscation) teknikleri kullanan modern tehditleri tespit etmekte yetersiz kalmaktadır. 
+## 👥 Proje Ekibi ve Akademik Künye
 
-Bu çalışmada, Kanada Siber Güvenlik Enstitüsü (UNB CIC) tarafından yayımlanan **CIC-MalMem-2022** veri seti kullanılmıştır. Veri seti, Volatility bellek adli bilişim aracıyla çıkarılan süreç, iş parçacığı, DLL, handle, sürücü, servis ve bellek enjeksiyonu özniteliklerini içermektedir. Projede **XGBoost** ve **LightGBM** algoritmaları hem **ikili (Binary: Benign vs Malware)** hem de **çok sınıflı (Multiclass: Benign, Ransomware, Spyware, Trojan)** olarak eğitilmiş, ardından **TreeExplainer** tabanlı SHAP analizi ile zararlı yazılımların RAM üzerinde bıraktığı izler tespit edilmiştir.
-
----
-
-## 📊 Veri Seti Bilgileri: CIC-MalMem-2022
-* **Kaynak:** University of New Brunswick (UNB) - Canadian Institute for Cybersecurity
-* **Dosya:** `Obfuscated-MalMem2022.csv`
-* **Toplam Satır:** 58,596 (Tekrarlayan 534 kayıt temizlendikten sonra: 58,062 benzersiz satır)
-* **Öznitelik Sayısı:** 55 adet sayısal bellek dökümü özniteliği
-* **Hedef Sınıflar:**
-  * **İkili Sınıflandırma (Class):**
-    * `Benign`: 29,231 (%50.34)
-    * `Malware`: 28,831 (%49.66)
-  * **Çok Sınıflı Sınıflandırma (Category):**
-    * `Benign`: 29,231 (%50.34)
-    * `Spyware`: 9,815 (%16.90)
-    * `Ransomware`: 9,529 (%16.41)
-    * `Trojan`: 9,487 (%16.34)
-
-### Bellek Analizi Modülleri (Volatility)
-* `pslist`: Süreç ve iş parçacığı istatistikleri
-* `dlllist`: Yüklenen dinamik bağlantı kitaplıkları (DLL)
-* `handles`: Süreçler tarafından açılan handle, port, muteks, dosya ve olay nesneleri
-* `ldrmodules`: Süreç bellek blokları ile modül listesi arasındaki uyumsuzluklar (DLL gizleme)
-* `malfind`: Gizli veya enjekte edilmiş kod blokları, bellek koruma izinleri (PAGE_EXECUTE_READWRITE)
-* `psxview`: Gizlenmiş süreçlerin tespiti (rootkit mekanizmaları)
-* `svcscan`: Windows servis kayıtları ve sürücü servisleri
-* `callbacks`: Çekirdek seviyesindeki geri çağırma (callback) fonksiyonları
+* **Geliştiriciler:**
+  * **Selim Şahin**
+  * **Ahmet Çöl**
+* **Proje Danışmanı:**
+  * **Öğr. Gör. Dr. Kubilay Ayturan**
+* **Kurum:**
+  * **Gazi Üniversitesi TUSAŞ-Kazan Meslek Yüksekokulu**
+  * Bilgisayar Teknolojileri Bölümü
+* **GitHub Deposu:**
+  * [https://github.com/AhmetCol11/malmem-xai-detection](https://github.com/AhmetCol11/malmem-xai-detection)
 
 ---
 
-## 📁 Proje Dosya Yapısı
-```text
-.
-├── data/
-│   ├── Obfuscated-MalMem2022.csv     # Ham CIC-MalMem-2022 veri seti
-│   ├── X_train.csv                   # %80 Eğitim özellik matrisi
-│   ├── X_test.csv                    # %20 Test özellik matrisi
-│   ├── y_train_class.csv             # İkili eğitim hedefleri
-│   ├── y_test_class.csv              # İkili test hedefleri
-│   ├── y_train_category.csv          # Çok sınıflı eğitim hedefleri
-│   ├── y_test_category.csv           # Çok sınıflı test hedefleri
-│   └── preprocessing_metadata.json   # Ön işleme meta verileri
-├── outputs/
-│   ├── model_karsilastirma.csv       # Modellerin metrik karşılaştırma tablosu
-│   ├── confusion_matrix.png          # 300 DPI Karmaşıklık matrisleri grafiği
-│   ├── best_model.joblib             # En başarılı eğitilmiş model nesnesi
-│   ├── best_model_info.json          # En başarılı modelin meta bilgileri
-│   ├── shap_summary.png              # 300 DPI SHAP Beeswarm dağılım grafiği
-│   ├── shap_bar.png                  # 300 DPI SHAP Global öznitelik önem grafiği
-│   └── shap_feature_importance.csv   # Detaylı SHAP önem sıralaması tablosu
-├── 1_veri_on_isleme.py               # Eksik/tekrar temizleme, hedef kodlama, stratified ayırma
-├── 2_model_egitimi.py                # XGBoost ve LightGBM model eğitimi ve metrik değerlendirme
-├── 3_shap_analizi.py                 # TreeExplainer ile bellek dökümü açıklanabilirlik analizi
-├── requirements.txt                  # Gerekli Python kütüphaneleri
-└── README.md                         # Proje dokümantasyonu
+## 📌 Problem Tanımı ve Girişimci Değer Önerisi
+
+### 1. Dosyasız (Fileless) Saldırı Körlüğü
+Geleneksel uç nokta güvenlik çözümleri (AV / EDR) genellikle disk tabanlı dosya taramalarına ve imza veri tabanlarına odaklanır. Ancak modern fidye yazılımları (Ransomware), casus yazılımlar (Spyware) ve gelişmiş kalıcı tehditler (APT); diskte dosya bırakmadan doğrudan RAM üzerinde çalışır, kod bloklarını şifreler veya bellek enjeksiyonu (`Process Hollowing`, `DLL Unlinking`) kullanarak kendilerini gizler.
+
+### 2. Kara Kutu (Black-Box) Güvensizliği ve Alarm Yorgunluğu
+Siber Güvenlik Operasyon Merkezlerinde (SOC) görev yapan analistler, "Bu süreç zararlıdır" uyarısı veren ancak gerekçesini açıklamayan yapay zeka modellerine güvenip kritik bir sunucuyu veya veri tabanını aniden kapatamaz.
+
+### 💡 MemGuard XAI Çözümü:
+1. **İkili Tespit (Binary):** Bellek dökümünü inceleyerek sistem sürecinin temiz (Benign) mi yoksa zararlı (Malware) mi olduğunu **%100.00 Accuracy** ve **0 Yanlış Alarm (Zero False Positive)** ile anında teşhis eder.
+2. **Çok Sınıflı Teşhis (Multiclass):** Tehdidin ailesini (**Ransomware**, **Spyware**, **Trojan**) **0.9758 ROC-AUC** skoruyla ayrıştırır.
+3. **SHAP Adli Bilişim Otopsisi (Explainable AI):** Analiste net delil sunar: *"Bu süreç zararlıdır; çünkü `svcscan.nservices` ve `handles.avg_handles_per_proc` parametreleri normal Windows profilinden saparak kalıcılık ve şifreleme aktivitesi sergilemiştir."*
+
+---
+
+## 🏗️ Sistem Mimarisi ve Akış Şeması
+
+```mermaid
+flowchart TD
+    subgraph Data_Layer ["1. Veri ve Adli Bilişim Katmanı"]
+        A["Ham Bellek Dökümü (RAM Dump)"] --> B["Volatility Bellek Çıkarımı"]
+        B --> C["CIC-MalMem-2022 Veri Seti\n(58,596 Satır, 55 Öznitelik)"]
+    end
+
+    subgraph Preprocessing ["2. Veri Ön İşleme (1_veri_on_isleme.py)"]
+        C --> D["Eksik & 534 Tekrar Kayıt Temizliği"]
+        D --> E["Etiketleme: Class (İkili) & Category (Çok Sınıflı)"]
+        E --> F["%80 Eğitim / %20 Test Stratified Ayrımı"]
+    end
+
+    subgraph Modeling ["3. Çift Çekirdekli Yapay Zeka (2_model_egitimi.py)"]
+        F --> G["XGBoost İkili Sınıflandırıcı\n(Benign vs Malware - %100 Acc)"]
+        F --> H["LightGBM Çok Sınıflı Ayırıcı\n(Ransomware / Spyware / Trojan - 0.9758 AUC)"]
+    end
+
+    subgraph XAI_Engine ["4. Açıklanabilir Yapay Zeka Motoru (3_shap_analizi.py)"]
+        G --> I["SHAP TreeExplainer Analizi"]
+        I --> J["Lokal Parametre Katkısı\n(Beeswarm & Force Plot)"]
+        I --> K["Global Adli Bilişim Önem Sıralaması"]
+    end
+
+    subgraph SOC_Platform ["5. MemGuard XAI SOC Platformu (app.py)"]
+        G --> L["Canlı Tekil Döküm Tarayıcı (Gauge Risk Skoru)"]
+        H --> L
+        J --> M["SHAP Otopsisi & Otomatik Analist Yorumu"]
+        L --> N["Toplu Uç Nokta Triyajı (Batch CSV)"]
+        M --> O["Tek Tıkla Adli Olay Raporu (.md Export)"]
+    end
 ```
 
 ---
 
-## ⚙️ Kurulum ve Gereksinimler
+## 📊 Deneysel Sonuçlar ve Performans Metrikleri
 
-Proje **Python 3.9+** (tercihen 3.10 - 3.12) sürümleriyle uyumludur.
+Bağımsız test kümesi (**11,613 adet daha önce görülmemiş bellek dökümü**) üzerinde yapılan testlerde elde edilen sonuçlar aşağıda sunulmuştur:
 
-### 1. Sanal Ortam Oluşturma (Önerilen)
+| Görev | Model | Doğruluk (Accuracy) | Kesinlik (Precision) | Duyarlılık (Recall) | F1-Score | ROC-AUC | Eğitim Süresi (sn) |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **İkili Sınıflandırma (`Class`)** | **XGBoost** | **%100.00** | **1.0000** | **1.0000** | **1.0000** | **1.0000** | **0.38 sn** |
+| **İkili Sınıflandırma (`Class`)** | **LightGBM** | **%100.00** | **1.0000** | **1.0000** | **1.0000** | **1.0000** | **0.26 sn** |
+| **Çok Sınıflı (`Category`)** | **LightGBM** | **%85.64** | **0.8562** | **0.8564** | **0.8562** | **0.9758** | **0.76 sn** |
+| **Çok Sınıflı (`Category`)** | **XGBoost** | **%85.28** | **0.8529** | **0.8528** | **0.8527** | **0.9744** | **1.13 sn** |
+
+> **Analitik Değerlendirme:**
+> * İkili sınıflandırma modelleri bellek dökümlerini sıfır hata ve sıfır yanlış alarm ile ayırt etmiştir. Bu bulgu, saldırganların diski atlatsalar dahi RAM üzerinde silinemez anomaliler bıraktığını doğrulamaktadır.
+> * Çok sınıflı görevde LightGBM, `0.9758` ROC-AUC ile Ransomware, Spyware ve Trojan ailelerini yüksek güvenilirlikle ayrıştırmıştır.
+
+---
+
+## 🔍 SHAP Açıklanabilirlik ve Adli Bilişim Bulguları
+
+Yapay zeka modellerinin kararlarında en belirleyici olan Volatility bellek öznitelikleri şunlardır:
+
+1. **`svcscan.nservices` & `svcscan.process_services` (SHAP: 3.7297):**
+   * Zararlı yazılımlar sistemde kalıcılık (persistence) sağlamak veya ayrıcalık yükseltmek (privilege escalation) için Windows arka plan servis tablolarını manipüle eder. Bu metrik kararda en yüksek ağırlığa sahiptir.
+2. **`handles.avg_handles_per_proc` & `handles.nevent` (SHAP: 1.4413):**
+   * Süreç başına açılan handle (tutamaç), muteks ve olay nesneleri incelendiğinde; fidye yazılımlarının şifreleme ve komuta kontrol (C2) bağlantıları sırasında normal yazılımlara göre olağan dışı handle açtığı tespit edilmiştir.
+3. **`ldrmodules.not_in_load` (SHAP: 0.2149):**
+   * PEB (Process Environment Block) ile modül listesi arasındaki uyumsuzluklar, saldırganın adli bilişim araçlarını atlatmak için DLL bağlantılarını kopardığını (`DLL Unlinking`) kanıtlar.
+4. **`malfind.uniqueInjections` & `malfind.commitCharge` (SHAP: 0.1522):**
+   * Süreç bellek alanlarına izinsiz kod enjekte edildiğini ve `PAGE_EXECUTE_READWRITE` gibi tehlikeli izinlere sahip bellek segmentlerini doğrular.
+
+### Kümülatif Volatility Modül Etkisi
+* **`svcscan`**: Toplam SHAP = **5.3669** (Kalıcılık tespiti)
+* **`handles`**: Toplam SHAP = **3.0224** (Dosya/muteks/olay anomalileri)
+* **`pslist`**: Toplam SHAP = **0.9125** (Süreç/iş parçacığı bozulmaları)
+* **`ldrmodules`**: Toplam SHAP = **0.4722** (Modül gizleme)
+* **`malfind`**: Toplam SHAP = **0.3153** (Kod enjeksiyonu)
+
+---
+
+## 🚀 Kurulum ve Çalıştırma Kılavuzu
+
+### 1. Gereksinimler ve Kurulum
+Sisteminizde Python 3.9+ (tercihen 3.10 - 3.12) yüklü olmalıdır.
+
 ```bash
+# Depoyu klonlayın
+git clone https://github.com/AhmetCol11/malmem-xai-detection.git
+cd malmem-xai-detection
+
+# Sanal ortam oluşturun ve aktifleştirin
 python -m venv venv
 # Windows:
 .\venv\Scripts\activate
 # Linux / macOS:
 source venv/bin/activate
-```
 
-### 2. Bağımlılıkların Kurulması
-```bash
+# Gerekli bağımlılıkları kurun
 pip install -r requirements.txt
 ```
 
----
+### 2. MemGuard XAI Web Dashboard'unu Başlatma (Önerilen)
+Kurumsal koyu temalı (Dark SOC) modern arayüzü doğrudan başlatmak için:
 
-## 🚀 Projeyi Çalıştırma Adımları
-
-Proje modüler olarak 3 ardışık adımdan oluşmaktadır:
-
-### Adım 1: Veri Ön İşleme
-Ham veri setini temizler, `Class` ve `Category` etiketlerini kodlar ve %80 eğitim / %20 test olarak stratified ayırarak `data/` altına kaydeder:
 ```bash
+streamlit run app.py
+```
+> Komut çalıştırıldığında tarayıcınızda otomatik olarak `http://localhost:8501` adresi açılacaktır.
+
+### 3. Modüler Arka Plan Betiklerini Sırayla Çalıştırma (Opsiyonel)
+Modelleri ve analizleri sıfırdan adım adım eğitmek için:
+
+```bash
+# Adım 1: Veri ön işleme ve stratified bölme
 python 1_veri_on_isleme.py
-```
 
-### Adım 2: Model Eğitimi ve Karşılaştırma
-XGBoost ve LightGBM modellerini eğitir, test seti üzerinde metrikleri hesaplar, terminale karşılaştırma tablosunu yazdırır, `outputs/model_karsilastirma.csv` dosyasını ve 300 DPI `outputs/confusion_matrix.png` grafiğini üretir:
-```bash
+# Adım 2: XGBoost ve LightGBM model eğitimi & değerlendirme
 python 2_model_egitimi.py
-```
 
-### Adım 3: SHAP ile Açıklanabilirlik Analizi
-En başarılı model üzerinde `shap.TreeExplainer` çalıştırarak zararlı yazılımları açığa çıkaran kritik bellek parametrelerini tespit eder, 300 DPI `outputs/shap_summary.png` ve `outputs/shap_bar.png` grafiklerini oluşturur:
-```bash
+# Adım 3: TreeExplainer ile SHAP analizleri ve 300 DPI grafik üretimi
 python 3_shap_analizi.py
 ```
 
 ---
 
-## 📈 Deneysel Sonuçlar ve Model Karşılaştırması
+## 📂 Proje Dizin Yapısı
 
-Test kümesi (11,613 örnek) üzerinde elde edilen sonuçlar:
-
-| Görev | Model | Accuracy | Precision | Recall | F1-Score | ROC-AUC | Eğitim Süresi (sn) |
-| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **İkili Sınıflandırma (Class)** | **XGBoost** | **1.0000** | **1.0000** | **1.0000** | **1.0000** | **1.0000** | 0.40 |
-| **İkili Sınıflandırma (Class)** | **LightGBM** | **1.0000** | **1.0000** | **1.0000** | **1.0000** | **1.0000** | 0.27 |
-| **Çok Sınıflı (Category)** | **LightGBM** | **0.8564** | **0.8562** | **0.8564** | **0.8562** | **0.9758** | 0.99 |
-| **Çok Sınıflı (Category)** | **XGBoost** | **0.8528** | **0.8529** | **0.8528** | **0.8527** | **0.9744** | 1.18 |
-
-> **Önemli Bulgular:**
-> * İkili sınıflandırmada (Benign vs Malware) hem XGBoost hem de LightGBM bellek dökümü özniteliklerinden %100 doğruluk ve kusursuz ROC-AUC skoru elde etmiştir. Bu durum, gizlenmiş zararlı yazılımların diskte kendilerini saklasalar dahi RAM üzerinde belirgin ve ayırt edilebilir anomali izleri bıraktığını kanıtlamaktadır.
-> * Çok sınıflı sınıflandırmada (Ransomware, Spyware, Trojan ve Benign ayrımı) modeller %85.6+ doğruluk ve 0.975+ ROC-AUC performansına ulaşmıştır.
-
----
-
-## 🔍 SHAP Açıklanabilirlik Analizi ve Güvenlik Bulguları
-
-SHAP analizi sonucunda modellerin karar verirken en çok ağırlık verdiği bellek mekanizmaları ve Volatility modülleri tespit edilmiştir:
-
-### En Etkili Bellek Parametreleri
-1. **`svcscan.nservices` & `svcscan.process_services`:** Zararlı yazılımların kalıcılık (persistence) sağlamak veya ayrıcalık yükseltmek amacıyla Windows arka plan servislerini manipüle etmesi veya yeni servis kayıtları oluşturması en güçlü tespiti sağlamaktadır.
-2. **`handles.avg_handles_per_proc` & `handles.nevent` / `handles.nthread`:** Zararlı yazılımların proses başına açtığı handle ve olay (event/synchronization) sayılarının normal yazılımlara kıyasla istatistiksel sapma göstermesi.
-3. **`ldrmodules.not_in_load`:** Gizlenmiş zararlı yazılımların PEB (Process Environment Block) üzerinden modül bağlantılarını kopararak (DLL unlinking) kendilerini adli bilişim araçlarından saklama girişimleri.
-4. **`malfind.uniqueInjections` & `malfind.commitCharge`:** Bellek alanına harici kod enjeksiyonu yapılması ve `PAGE_EXECUTE_READWRITE` korumalı hafıza bloklarının varlığı.
-5. **`pslist.avg_threads` & `pslist.nppid`:** Şüpheli ebeveyn-çocuk proses ilişkileri (PID/PPID anormallikleri) ve anormal iş parçacığı sayıları.
-
-### Kümülatif Modül Etkisi
-* **`svcscan`**: Toplam SHAP = **5.3669** (En belirleyici ana modül)
-* **`handles`**: Toplam SHAP = **3.0224**
-* **`pslist`**: Toplam SHAP = **0.9125**
-* **`ldrmodules`**: Toplam SHAP = **0.4722**
-* **`malfind`**: Toplam SHAP = **0.3153**
+```text
+.
+├── .streamlit/
+│   └── config.toml                   # Kurumsal koyu tema (Dark SOC) Streamlit ayarları
+├── .env.example                      # Ortam değişkenleri yapılandırma şablonu
+├── .gitignore                        # Kurumsal Git hariç tutma kuralları
+├── app.py                            # MemGuard XAI Streamlit SOC Web Dashboard'u
+├── 1_veri_on_isleme.py               # Eksik/tekrar temizleme ve hedef hazırlama betiği
+├── 2_model_egitimi.py                # XGBoost & LightGBM eğitim ve metrik karşılaştırma betiği
+├── 3_shap_analizi.py                 # TreeExplainer ile bellek dökümü XAI analiz betiği
+├── requirements.txt                  # Python kütüphane bağımlılıkları
+├── README.md                         # Kapsamlı proje dokümantasyonu
+├── data/
+│   ├── Obfuscated-MalMem2022.csv     # Ham CIC-MalMem-2022 veri seti
+│   ├── X_train.csv / X_test.csv      # Stratified eğitim ve test öznitelik matrisleri
+│   ├── y_train_*.csv / y_test_*.csv  # İkili ve çok sınıflı hedef vektörleri
+│   └── preprocessing_metadata.json   # Veri hazırlık meta verileri
+└── outputs/
+    ├── best_model.joblib             # Eğitilmiş ikili XGBoost modeli
+    ├── multiclass_model.joblib       # Eğitilmiş çok sınıflı LightGBM modeli
+    ├── model_karsilastirma.csv       # Modellerin metrik karşılaştırma tablosu
+    ├── confusion_matrix.png          # 300 DPI Karmaşıklık matrisleri grafiği
+    ├── shap_summary.png              # 300 DPI SHAP Beeswarm dağılım grafiği
+    ├── shap_bar.png                  # 300 DPI SHAP Global öznitelik önem grafiği
+    └── shap_feature_importance.csv   # Sayısal SHAP önem sıralaması tablosu
+```
 
 ---
 
 ## 📜 Lisans ve Atıf
-* Veri Seti: Canadian Institute for Cybersecurity (CIC), University of New Brunswick (UNB).
-* Proje kodu akademik ve araştırma amaçlı geliştirilmiştir.
-
-
+* **Veri Seti:** Canadian Institute for Cybersecurity (CIC), University of New Brunswick (UNB).
+* **Lisans:** Bu proje [MIT Lisansı](LICENSE) kapsamında açık kaynak olarak sunulmuştur; akademik ve araştırma amaçlı serbestçe kullanılabilir.
