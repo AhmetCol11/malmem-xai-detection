@@ -1,0 +1,20 @@
+# Veri seti dosyaları (Boyut ve performans optimizasyonu)
+data/
+*.csv.gz
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+env/
+.env
+
+# IDE ve OS geçici dosyaları
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
